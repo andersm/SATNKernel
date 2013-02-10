@@ -70,7 +70,6 @@ extern "C"  {
     int   tn_chk_irq_disabled(void);
     int   tn_inside_int(void);
     int   ffs_asm(unsigned int val);
-    int   tn_inside_int(void);
     void *tn_hook_vec(int vec, void *func);
 
     void  tn_switch_context_trap(void);
