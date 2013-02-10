@@ -1,10 +1,4 @@
-SATNKernel
-==========
-
-SATNKernel is a port of the [TNKernel](http://www.tnkernel.com/ "TNKernel") real-time kernel version 2.6 for the Sega Saturn game console.
-In addition to porting the kernel to the SH2 architecture, modifications have been made to allow running separate instances of the kernel on the master and slave CPUs. There is no SMP support included.
-
-The kernel is released under the BSD license as follows:
+/*
 
     SATNKernel real-time kernel for the Sega Saturn
     Based on TNKernel version 2.6
@@ -30,3 +24,11 @@ The kernel is released under the BSD license as follows:
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
+
+*/
+
+/* Vector table index used as kernel context pointer */
+#define TN_KERNEL_VECTOR            106
+
+/* System trap number used for context switch routine */
+#define TN_CONTEXT_SWITCH_TRAP      107
