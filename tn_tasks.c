@@ -729,7 +729,7 @@ int tn_task_change_priority(TN_TCB * task, int new_priority)
 //----------------------------------------------------------------------------
 void find_next_task_to_run(void)
 {
-    unsigned int tmp;
+    int tmp;
 
 #ifndef USE_ASM_FFS
     int i;
@@ -740,7 +740,7 @@ void find_next_task_to_run(void)
 
 #ifdef USE_ASM_FFS
     tmp = ffs_asm(kctx->tn_ready_to_run_bmp);
-    tmp--;                               // bug?
+    tmp--;
 #else
 
     mask = 1;
@@ -995,14 +995,14 @@ void set_current_priority(TN_TCB * task, int priority)
             if (task->task_wait_reason == TSK_WAIT_REASON_MUTEX_I)
             {
                 task->priority = priority;
-                
+
                 mutex = get_mutex_by_wait_queque(task->pwait_queue);
                 task  = mutex->holder;
-                
+
                 continue;
             }
         }
-        
+
         task->priority = priority;
         return;
     }
@@ -1016,33 +1016,33 @@ void task_set_dormant_state(TN_TCB* task)
     queue_reset(&(task->task_queue));
     queue_reset(&(task->timer_queue));
     queue_reset(&(task->create_queue));
-    
+
 #ifdef USE_MUTEXES
-    
+
     queue_reset(&(task->mutex_queue));
-    
+
 #endif
-    
+
     task->pwait_queue = NULL;
-    
+
     task->priority    = task->base_priority; //-- Task curr priority
     task->task_state  = TSK_STATE_DORMANT;   //-- Task state
     task->task_wait_reason = 0;              //-- Reason for waiting
     task->task_wait_rc = TERR_NO_ERR;
-    
+
 #ifdef USE_EVENTS
-    
+
     task->ewait_pattern = 0;                 //-- Event wait pattern
     task->ewait_mode    = 0;                 //-- Event wait mode:  _AND or _OR
-    
+
 #endif
-    
+
     task->data_elem     = NULL;              //-- Store data queue entry,if data queue is full
-    
+
     task->tick_count    = TN_WAIT_INFINITE;  //-- Remaining time until timeout
     task->wakeup_count  = 0;                 //-- Wakeup request count
     task->suspend_count = 0;                 //-- Suspension count
-    
+
     task->tslice_count  = 0;
 }
 

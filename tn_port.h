@@ -47,6 +47,8 @@
 
 #define  TN_PORT_STACK_EXPAND_AT_EXIT  21
 
+#define  USE_ASM_FFS
+
 //----------------------------------------------------
 
 #define  TN_NUM_PRIORITY        TN_BITS_IN_INT  //-- 0..31  Priority 0 always is used by timers task
