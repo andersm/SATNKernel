@@ -60,7 +60,7 @@ void tn_start_system(TN_KERN_CTX *kctx)
 
     //-- Clear/set all globals (vars, lists, etc)
 
-    for (i=0; i < TN_NUM_PRIORITY; i++)
+    for (i = 0; i < TN_NUM_PRIORITY; i++)
     {
         queue_reset(&(kctx->tn_ready_list[i]));
         kctx->tn_tslice_ticks[i] = NO_TIME_SLICE;
@@ -80,6 +80,11 @@ void tn_start_system(TN_KERN_CTX *kctx)
 
     kctx->tn_next_task_to_run = NULL;
     kctx->tn_curr_run_task    = NULL;
+
+#ifdef TN_INT_STACK
+    // SH uses pre-decrement stack pointer
+    kctx->tn_int_sp = &kctx->tn_int_stack[TN_INT_STACK_SIZE];
+#endif
 
     //-- System tasks
 
@@ -279,7 +284,7 @@ void  tn_tick_int_processing()
     kctx->tn_ready_to_run_bmp |= 1;  // priority 0;
 
     kctx->tn_next_task_to_run = &kctx->tn_timer_task;
-    
+
     tn_ienable_interrupt();  //--  !!! thanks to Audrius Urmanavicius !!!
 }
 

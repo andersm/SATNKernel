@@ -34,74 +34,101 @@
 #define TN_KERN_NEXT_TASK_TO_RUN    4
 #define TN_KERN_SYSTEM_STATE        8
 #define TN_KERN_NEST_COUNT         12
+#define TN_USER_SP                 32
+#define TN_INT_SP                  36
 
 
 /* Interrupt handler wrapper macro */
 !-----------------------------------------------------------------------------
     .macro _tn_cpu_irq_isr handlerfunc:req
-    ! save caller-save registers
+    ! create working space (may always go on user stack)
     mov.l   r0, @-r15
     mov.l   r1, @-r15
+
+    ! disable interrupts
+    stc     sr, r1
+    mov     #0xf0, r0
+    ldc     r0, sr
+
     mov.l   r2, @-r15
+
+    ! increase nesting count
+    mov     #TN_KERNEL_VECTOR, r0
+    shll2   r0
+    stc     vbr, r2
+    mov.l   @(r0, r2), r2
+
+    mov.l   @(TN_KERN_NEST_COUNT, r2), r0
+    add     #1, r0
+#ifdef TN_INT_STACK
+    cmp/eq  #1, r0
+    bf/s    1f
+#endif
+    mov.l   r0, @(TN_KERN_NEST_COUNT, r2)
+#ifdef TN_INT_STACK
+    ! switch to interrupt stack if first interrupt
+    mov.l   r15, @(TN_USER_SP, r2)
+    mov.l   @(TN_INT_SP, r2), r15
+1:
+#endif
+
+    ! re-enable interrupts
+    ldc     r1, sr
+
+    ! save rest of caller-save registers
     mov.l   r3, @-r15
     mov.l   r4, @-r15
     mov.l   r5, @-r15
     mov.l   r6, @-r15
     sts.l   pr, @-r15
 
-    ! increase nesting count
-    mov     #TN_KERNEL_VECTOR, r0
-    shll2   r0
-    stc     vbr, r1
-    mov.l   @(r0, r1), r1
-
-    ! disable interrupts
-    stc     sr, r2
-    mov     #0xf0, r0
-    ldc     r0, sr
-
-    mov.l   @(TN_KERN_NEST_COUNT, r1), r0
-    add     #1, r0
-    mov.l   r0, @(TN_KERN_NEST_COUNT, r1)
-
-    ! re-enable interrupts
-    ldc     r2, sr
-
-    mov.l   1f, r0
+    ! call ISR
+    mov.l   2f, r0
     jsr     @r0
     mov.l   r7, @-r15
 
-    ! decrease nesting count
-    mov     #TN_KERNEL_VECTOR, r0
-    shll2   r0
-    stc     vbr, r1
-    mov.l   @(r0, r1), r1
-
-    ! disable interrupts
-    stc     sr, r2
-    mov     #0xf0, r0
-    ldc     r0, sr
-
-    mov.l   @(TN_KERN_NEST_COUNT, r1), r0
-    add     #-1, r0
-    mov.l   r0, @(TN_KERN_NEST_COUNT, r1)
-
-    ! re-enable interrupts
-    ldc     r2, sr
-
+    ! restore caller-save registers
     mov.l   @r15+, r7
     lds.l   @r15+, pr
     mov.l   @r15+, r6
     mov.l   @r15+, r5
     mov.l   @r15+, r4
     mov.l   @r15+, r3
+
+    ! disable interrupts
+    mov     #TN_KERNEL_VECTOR, r0
+    shll2   r0
+    stc     vbr, r1
+    mov.l   @(r0, r1), r1
+    stc     sr, r2
+    mov     #0xf0, r0
+    ldc     r0, sr
+
+    ! decrease nesting count
+    mov.l   @(TN_KERN_NEST_COUNT, r1), r0
+    dt      r0
+#ifdef TN_INT_STACK
+    bf/s    1f
+#endif
+    mov.l   r0, @(TN_KERN_NEST_COUNT, r1)
+#ifdef TN_INT_STACK
+    ! switch to user stack if last interrupt
+    mov.l   r15, @(TN_INT_SP, r1)
+    mov.l   @(TN_USER_SP, r1), r15
+1:
+#endif
+    ! re-enable interrupts
+    ldc     r2, sr
+
+    ! restore rest of state,
+    ! jump to context switch routine
     mov.l   @r15+, r2
     mov.l   @r15+, r1
-    mov.l   2f, r0
+    mov.l   3f, r0
     jmp     @r0
     mov.l   @r15+, r0
 
     .align 2
-1:  .long \handlerfunc
-2:  .long _tn_switch_context_trap
+2:  .long \handlerfunc
+3:  .long _tn_switch_context_trap
     .endm

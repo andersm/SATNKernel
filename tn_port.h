@@ -36,8 +36,8 @@
 
 
 #define  TN_TIMER_STACK_SIZE       80
-#define  TN_IDLE_STACK_SIZE        48
-#define  TN_MIN_STACK_SIZE         44
+#define  TN_IDLE_STACK_SIZE        60
+#define  TN_MIN_STACK_SIZE         53
 
 #define  TN_BITS_IN_INT            32
 

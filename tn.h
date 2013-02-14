@@ -50,13 +50,7 @@
 
 //--- The system configuration (change it for your particular project)
 
-#define  TN_CHECK_PARAM       1
-
-#define  TN_MEAS_PERFORMANCE  1
-
-#define  USE_MUTEXES          1
-
-#define  USE_EVENTS           1
+#include "tn_port_config.h"
 
 //--- Port
 
@@ -275,6 +269,11 @@ typedef struct _TN_KERN_CTX
     volatile unsigned long tn_idle_count;
     volatile unsigned long tn_curr_performance;
 
+#ifdef TN_INT_STACK
+    void * tn_user_sp;
+    void * tn_int_sp;
+#endif
+
     CDLL_QUEUE tn_wait_timeout_list;    //-- all tasks that wait timeout expiration
     CDLL_QUEUE tn_create_queue;         //-- all created tasks (now - for statictic only)
 
@@ -285,6 +284,9 @@ typedef struct _TN_KERN_CTX
 
     unsigned int tn_timer_task_stack[TN_TIMER_STACK_SIZE];
     unsigned int tn_idle_task_stack[TN_IDLE_STACK_SIZE];
+#ifdef TN_INT_STACK
+    unsigned int tn_int_stack[TN_INT_STACK_SIZE];
+#endif
 
     CDLL_QUEUE tn_ready_list[TN_NUM_PRIORITY];        //-- all ready to run (RUNNABLE) tasks
 }TN_KERN_CTX;

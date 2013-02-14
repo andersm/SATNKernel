@@ -27,8 +27,28 @@
 
 */
 
+
+#ifndef  _TN_PORT_CONFIG_H_
+#define  _TN_PORT_CONFIG_H_
+
+#define  TN_CHECK_PARAM       1
+
+#define  TN_MEAS_PERFORMANCE  1
+
+#define  USE_MUTEXES          1
+
+#define  USE_EVENTS           1
+
+/* Use interrupt stack */
+#define  TN_INT_STACK         1
+
 /* Vector table index used as kernel context pointer */
 #define TN_KERNEL_VECTOR            106
 
 /* System trap number used for context switch routine */
 #define TN_CONTEXT_SWITCH_TRAP      107
+
+/* Interrupt stack size, in words */
+#define TN_INT_STACK_SIZE           170
+
+#endif

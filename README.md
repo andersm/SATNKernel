@@ -4,6 +4,26 @@ SATNKernel
 SATNKernel is a port of the [TNKernel](http://www.tnkernel.com/ "TNKernel") real-time kernel version 2.6 for the Sega Saturn game console.
 In addition to porting the kernel to the SH2 architecture, modifications have been made to allow running separate instances of the kernel on the master and slave CPUs. There is no SMP support included.
 
+Estimating task stack space requirements
+----------------------------------------
+
+If an interrupt stack is not used, the absolute minimum stack size can be calculated as follows:  
+>size of context (21) + size of stack expansion at exit (21) + 11 * number of used interrupt levels
+
+If all 15 interrupt levels are used, this equals 207 words (828 bytes).
+
+If an interrupt stack is used, this changes to:  
+>size of context (21) + size of stack expansion at exit (21) + 4 * (number of used interrupt levels - 1) + 5
+
+The minimum size of the interrupt stack is:  
+>11 * (number of used interrupt levels - 1) + 6
+
+If all 15 interrupt levels are used, this equals 103 words (412 bytes) for tasks and 160 words (640 bytes) for the interrupt stack.
+
+This does not account for stack space used by the tasks or interrupt handlers.
+
+---
+
 The kernel is released under the BSD license as follows:
 
     SATNKernel real-time kernel for the Sega Saturn
