@@ -134,7 +134,6 @@ _tn_switch_context:
     nop
 
 !-----------------------------------------------------------------------------
-    .align 2
 _tn_switch_context_trap:
     ! save registers
     mov.l   r0, @-r15
@@ -144,7 +143,7 @@ _tn_switch_context_trap:
 
     ! returning to user level?
     tst     #0xf0, r0
-    bf      1f
+    bf      2f
 
     ! disable interrupts
     mov     #0xf0, r0
@@ -152,6 +151,17 @@ _tn_switch_context_trap:
 
     mov.l   r1, @-r15
     mov.l   r2, @-r15
+
+    mov     #TN_KERNEL_VECTOR, r0
+    shll2   r0
+    stc     vbr, r1
+    mov.l   @(r0, r1), r1
+    mov.l   @(TN_KERN_CURR_RUN_TASK, r1), r0
+    mov.l   @(TN_KERN_NEXT_TASK_TO_RUN, r1), r2
+    ! exit if not switching tasks
+    cmp/eq  r0, r2
+    bt      1f
+
     mov.l   r3, @-r15
     mov.l   r4, @-r15
     mov.l   r5, @-r15
@@ -168,13 +178,6 @@ _tn_switch_context_trap:
     sts.l   mach, @-r15
     stc.l   gbr, @-r15
     sts.l   pr, @-r15
-
-    mov     #TN_KERNEL_VECTOR, r0
-    shll2   r0
-    stc     vbr, r1
-    mov.l   @(r0, r1), r1
-    mov.l   @(TN_KERN_CURR_RUN_TASK, r1), r0
-    mov.l   @(TN_KERN_NEXT_TASK_TO_RUN, r1), r2
 
     ! store SP in preempted task's TCB
     mov.l   r15, @r0
@@ -201,9 +204,10 @@ _tn_switch_context_trap:
     mov.l   @r15+, r5
     mov.l   @r15+, r4
     mov.l   @r15+, r3
+1:
     mov.l   @r15+, r2
     mov.l   @r15+, r1
-1:
+2:
     mov.l   @r15+, r0
     rte
     nop
