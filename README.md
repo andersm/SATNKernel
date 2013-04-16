@@ -22,6 +22,17 @@ If all 15 interrupt levels are used, this equals 103 words (412 bytes) for tasks
 
 This does not account for stack space used by the tasks or interrupt handlers.
 
+Notice regarding the division unit
+----------------------------------
+
+Neither the interrupt dispatch macros nor the thread context switch routine will attempt to preserve the
+state of the SH7095 division peripheral. This is mainly a concern if attempting to use
+SATNKernel with the SGL libraries, which use [GCC library routines](http://gcc.gnu.org/onlinedocs/gccint/Integer-library-routines.html)
+to implement integer division using the peripheral.
+
+For the same reason all users of the SGL libraries should be mindful of using integer division inside
+interrupt handlers.
+
 ---
 
 The kernel is released under the BSD license as follows:
