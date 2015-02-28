@@ -66,8 +66,10 @@ _tn_start_exe:
     mov     #1, r0
     mov.l   r0, @(TN_KERN_SYSTEM_STATE, r1)
 
+    ! set highest priority task to current
+    mov.l   @(TN_KERN_NEXT_TASK_TO_RUN, r1), r0
+    mov.l   r0, @(TN_KERN_CURR_RUN_TASK, r1)
     ! switch to new stack pointer
-    mov.l   @(TN_KERN_CURR_RUN_TASK, r1), r0
     mov.l   @r0, r15
 
     lds.l   @r15+, pr
@@ -101,8 +103,10 @@ _tn_switch_context_exit:
     stc     vbr, r1
     mov.l   @(r0, r1), r1
 
+    ! set highest priority task to current
+    mov.l   @(TN_KERN_NEXT_TASK_TO_RUN, r1), r0
+    mov.l   r0, @(TN_KERN_CURR_RUN_TASK, r1)
     ! switch to new stack pointer
-    mov.l   @(TN_KERN_CURR_RUN_TASK, r1), r0
     mov.l   @r0, r15
 
     lds.l   @r15+, pr
