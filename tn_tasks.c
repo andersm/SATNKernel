@@ -494,7 +494,7 @@ void tn_task_exit(int attr)
      'stack_exp' - thanks to Angelo R. Di Filippo
      */
     struct  // v.2.7
-    {	
+    {
 #ifdef USE_MUTEXES
         CDLL_QUEUE * que;
         TN_MUTEX * mutex;
@@ -556,16 +556,10 @@ int tn_task_terminate(TN_TCB * task)
     TN_INTSAVE_DATA
 
     int rc;
-    /* see the structure purpose in tn_task_exit() */
-    struct // v.2.7
-    {
 #ifdef USE_MUTEXES
-        CDLL_QUEUE * que;
-        TN_MUTEX * mutex;
+    CDLL_QUEUE * que;
+    TN_MUTEX * mutex;
 #endif
-        volatile int stack_exp[TN_PORT_STACK_EXPAND_AT_EXIT];
-    }data;
-
     TN_KERN_CTX * kctx;
 
 #if TN_CHECK_PARAM
@@ -608,9 +602,9 @@ int tn_task_terminate(TN_TCB * task)
 #ifdef USE_MUTEXES
         while (!is_queue_empty(&(task->mutex_queue)))
         {
-            data.que = queue_remove_head(&(task->mutex_queue));
-            data.mutex = get_mutex_by_mutex_queque(data.que);
-            do_unlock_mutex(data.mutex);
+            que = queue_remove_head(&(task->mutex_queue));
+            mutex = get_mutex_by_mutex_queque(que);
+            do_unlock_mutex(mutex);
         }
 #endif
 
@@ -1009,7 +1003,7 @@ void task_set_dormant_state(TN_TCB* task)
     // v.2.7 - thanks to Alexander Gacov, Vyacheslav Ovsiyenko
     queue_reset(&(task->task_queue));
     queue_reset(&(task->timer_queue));
-    
+
 #ifdef USE_MUTEXES
 
     queue_reset(&(task->mutex_queue));
