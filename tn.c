@@ -216,11 +216,7 @@ static void tn_idle_task_func(void * par)
 //----------------------------------------------------------------------------
 int tn_sys_tslice_ticks(int priority, int value)
 {
-    TN_INTSAVE_DATA
-
     TN_CHECK_NON_INT_CONTEXT
-
-    tn_disable_interrupt();
 
     if (priority <= 0 || priority >= TN_NUM_PRIORITY-1 ||
         value < 0 || value > MAX_TIME_SLICE)
@@ -228,7 +224,6 @@ int tn_sys_tslice_ticks(int priority, int value)
 
     tn_kern_ctx_ptr()->tn_tslice_ticks[priority] = value;
 
-    tn_enable_interrupt();
     return TERR_NO_ERR;
 }
 
