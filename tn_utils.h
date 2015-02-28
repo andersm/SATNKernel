@@ -1,9 +1,9 @@
 /*
 
     SATNKernel real-time kernel for the Sega Saturn
-    Based on TNKernel version 2.6
+    Based on TNKernel version 2.7
 
-    Copyright © 2004, 2010 Yuri Tiomkin
+    Copyright © 2004, 2013 Yuri Tiomkin
     Saturn version modifications copyright © 2013 Anders Montonen
     All rights reserved.
 

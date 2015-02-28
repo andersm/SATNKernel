@@ -1,9 +1,9 @@
 /*
 
     SATNKernel real-time kernel for the Sega Saturn
-    Based on TNKernel version 2.6
+    Based on TNKernel version 2.7
 
-    Copyright © 2004, 2010 Yuri Tiomkin
+    Copyright © 2004, 2013 Yuri Tiomkin
     Saturn version modifications copyright © 2013 Anders Montonen
     All rights reserved.
 
@@ -34,7 +34,7 @@
 #ifdef USE_MUTEXES
 
 /*
-    The ceiling protocol in ver 2.6 is more "lightweight" in comparison
+    The ceiling protocol in ver 2.6 and latest is more "lightweight" in comparison
     to previous versions.
     The code of ceiling protocol is derived from Vyacheslav Ovsiyenko version
  */
@@ -44,7 +44,7 @@
 // to Real-Time Synchronization, IEEE Transactions on Computers, Vol.39, No.9, 1990
 
 //----------------------------------------------------------------------------
-//  Structure's Field mutex->id_mutex have to be set to 0
+//  Structure's Field mutex->id_mutex should be set to 0
 //----------------------------------------------------------------------------
 int tn_mutex_create(TN_MUTEX * mutex,
                     int attribute,
@@ -94,17 +94,14 @@ int tn_mutex_delete(TN_MUTEX * mutex)
     TN_CHECK_NON_INT_CONTEXT
 
     if (tn_kern_ctx_ptr()->tn_curr_run_task != mutex->holder)
-    {
-        tn_enable_interrupt();
         return TERR_ILUSE;
-    }
 
     //-- Remove all tasks(if any) from mutex's wait queue
 
+    tn_disable_interrupt(); // v.2.7 - thanks to Eugene Scopal
+    
     while (!is_queue_empty(&(mutex->wait_queue)))
     {
-        tn_disable_interrupt();
-
         que  = queue_remove_head(&(mutex->wait_queue));
         task = get_task_by_tsk_queue(que);
 
@@ -115,11 +112,9 @@ int tn_mutex_delete(TN_MUTEX * mutex)
             task->task_wait_rc = TERR_DLT;
             tn_enable_interrupt();
             tn_switch_context();
+            tn_disable_interrupt(); // v.2.7
         }
     }
-
-    if (tn_chk_irq_disabled() == 0)
-        tn_disable_interrupt();
 
     if (mutex->holder != NULL)  //-- If the mutex is locked
     {

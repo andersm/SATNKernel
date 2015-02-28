@@ -1,9 +1,9 @@
 /*
 
     SATNKernel real-time kernel for the Sega Saturn
-    Based on TNKernel version 2.6
+    Based on TNKernel version 2.7
 
-    Copyright © 2004, 2010 Yuri Tiomkin
+    Copyright © 2004, 2013 Yuri Tiomkin
     Saturn version modifications copyright © 2013 Anders Montonen
     All rights reserved.
 
@@ -264,10 +264,13 @@ void  tn_tick_int_processing()
             //-- If ready queue is not empty and qty  of queue's tasks > 1
             if (!(is_queue_empty((CDLL_QUEUE *)pri_queue)) && pri_queue->next->next != pri_queue)
             {
-                //-- Remove task from tail and add it to the head of
+                // v.2.7  - Thanks to Vyacheslav Ovsiyenko
+
+                //-- Remove task from head and add it to the tail of
                 //-- ready queue for current priority
-                curr_que = queue_remove_tail(&(kctx->tn_ready_list[priority]));
-                queue_add_head(&(kctx->tn_ready_list[priority]), (CDLL_QUEUE *)curr_que);
+
+                curr_que = queue_remove_head(&(kctx->tn_ready_list[priority]));
+                queue_add_tail(&(kctx->tn_ready_list[priority]), (CDLL_QUEUE *)curr_que);
             }
         }
     }
