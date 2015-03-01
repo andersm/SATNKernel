@@ -500,8 +500,8 @@ void tn_task_exit(int attr)
         TN_MUTEX * mutex;
 #endif
         TN_TCB * task;
-        volatile int stack_exp[TN_PORT_STACK_EXPAND_AT_EXIT];
         TN_KERN_CTX * kctx;
+        volatile int stack_exp[TN_PORT_STACK_EXPAND_AT_EXIT];
     }data;
 
     TN_CHECK_NON_INT_CONTEXT_NORETVAL
