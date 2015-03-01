@@ -240,9 +240,9 @@ void  tn_tick_int_processing()
 
     TN_CHECK_INT_CONTEXT_NORETVAL
 
-    tn_idisable_interrupt();
-
     kctx = tn_kern_ctx_ptr();
+
+    tn_idisable_interrupt();
 
     //-------  Round -robin (if is used)
 

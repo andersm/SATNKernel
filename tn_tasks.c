@@ -91,7 +91,7 @@ int tn_task_create(TN_TCB * task,                   //-- task TCB
                               task->task_func_param);
 
     task->task_stk = ptr_stack;    //-- Pointer to task top of stack,
-    //-- when not running
+                                   //-- when not running
 
 
     //-- Add task to created task queue
@@ -506,9 +506,9 @@ void tn_task_exit(int attr)
 
     TN_CHECK_NON_INT_CONTEXT_NORETVAL
 
-    tn_cpu_save_sr();  // disable interrupts without saving status
-
     data.kctx = tn_kern_ctx_ptr();
+
+    tn_cpu_save_sr();  // disable interrupts without saving status
 
     //--------------------------------------------------
 
@@ -571,9 +571,9 @@ int tn_task_terminate(TN_TCB * task)
 
     TN_CHECK_NON_INT_CONTEXT
 
-    tn_disable_interrupt();
-
     kctx = tn_kern_ctx_ptr();
+
+    tn_disable_interrupt();
 
     //--------------------------------------------------
 
@@ -955,7 +955,7 @@ void set_current_priority(TN_TCB * task, int priority)
     //-- transitive priority changing
 
     // if we have a task A that is blocked by the task B and we changed priority
-    // of task A,priority of task B also have to be changed. I.e, if we have
+    // of task A, priority of task B also have to be changed. I.e, if we have
     // the task A that is waiting for the mutex M1 and we changed priority
     // of this task, a task B that holds a mutex M1 now, also needs priority's
     // changing.  Then, if a task B now is waiting for the mutex M2, the same
